@@ -1,0 +1,2 @@
+# NPK-Backup
+Um pequeno utilitário para automatizar a cópia de segurança de uma determinada pasta (por exemplo, cópias de segurança locais de bases de dados Filemaker, coleções de scripts e aplicações do Pythonista, etc.), criando arquivos zip individuais a partir de cada pasta principal na localização especificada e fazendo upload dos mesmos para a Dropbox. O programa mantém um registo simples, por forma a nao repetir as tarefas de compressão e upload já realizadas.
