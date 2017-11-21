@@ -19,14 +19,20 @@ import os
 
 import dropbox
 
-#from app_settings import *
-#from app_settings_iOS import *
-from app_settings_Mac import *
+from app_settings import *
 
 
-def obter_registo(register_file_path):
-    """ Obtém do ficheiro de registo a lista das pastas já copiadas. """
-    pass
+def obter_lista_de_pastas(register_file_path):
+    """ Obtém do ficheiro de registo a lista das pastas já copiadas e compara
+        essa lista com as pastas existentes no computador local. A função
+        devolve a lista das pastas a arquivar e copiar.
+    """
+    return [INPUT_FOLDER] #TODO
+
+
+def adiciona_registo(folder):
+    """ Adiciona o caminho especificado ao ficheiro de registo. """
+    print("Adicionando registo (TODO)") #TODO
 
 
 def comprimir_pasta(origem, destino):
@@ -54,39 +60,33 @@ def upload_dropbox(archive, dropbox_path, token):
         print(e)
         return None
 
+
 def apagar_arquivo(archive):
     """ Apaga o ficheiro especificado no sistema de ficheiros local. """
     try:
-        pass #TODO
+        os.remove(archive)
     except Exception as e:
         print('\n\nOcorreu um erro ao apagar o arquivo zip:')
         print(e)
-        
-
-def adiciona_registo(folder):
-    """ Adiciona o caminho especificado ao ficheiro de registo. """
-    pass
 
 
 def main():
-    timestamp = str(datetime.datetime.now())
-    input_path = os.path.expanduser(INPUT_FOLDER)
-    archive_path = os.path.expanduser(ARCHIVE_NAME + timestamp)
-    dropbox_archive_path = REMOTE_PATH + timestamp + ".zip"
     backup_log_path = os.path.expanduser(BACKUP_LOG_FILE)
     dropbox_token = TOKEN
+    
+    for path in obter_lista_de_pastas(backup_log_path):
+        timestamp = str(datetime.datetime.now())
+        input_path = os.path.expanduser(path)
+        archive_path = os.path.expanduser(ARCHIVE_PATH + ARCHIVE_FILE_NAME + timestamp)
+        dropbox_archive_path = REMOTE_PATH + timestamp + ".zip"
 
+        arquivo = comprimir_pasta(input_path, archive_path)
 
-    arquivo = comprimir_pasta(input_path, archive_path)
-
-    if arquivo:
-        if upload_dropbox(arquivo, dropbox_archive_path, dropbox_token):
-            adiciona_registo(input_path)
-        apagar_arquivo(arquivo)
-        pass # continue
-    else:
-        pass # continue
-
+        if arquivo:
+            if upload_dropbox(arquivo, dropbox_archive_path, dropbox_token):
+                adiciona_registo(input_path)
+            apagar_arquivo(arquivo)
+    
 
 if __name__ == "__main__":
     main()
