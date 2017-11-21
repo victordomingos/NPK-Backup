@@ -15,11 +15,14 @@ Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
 
 import shutil
 import datetime
-import os
+import os, os.path
+from pathlib import Path
 
 import dropbox
 
-from app_settings import *
+#from app_settings import *
+#from app_settings_iOS import *
+from app_settings_Mac import *
 
 
 def obter_lista_de_pastas(register_file_path):
@@ -27,7 +30,15 @@ def obter_lista_de_pastas(register_file_path):
         essa lista com as pastas existentes no computador local. A função
         devolve a lista das pastas a arquivar e copiar.
     """
-    return [INPUT_FOLDER] #TODO
+    # Lista todas as subpastas na pasta principal (aqui designada como "raiz")
+    raiz = os.path.expanduser(INPUT_FOLDER)
+    pastas = ["{}{}{}".format(raiz, "/", pasta) for pasta in next(os.walk(raiz))[1]]
+    
+    # Obter do ficheiro a lista das pastas já tratadas e gerar lista sem essas
+
+    lista_final = pastas     #TODO - retirar as pastas já presentes no ficheiro de registo
+
+    return lista_final
 
 
 def adiciona_registo(folder):
@@ -37,10 +48,11 @@ def adiciona_registo(folder):
 
 def comprimir_pasta(origem, destino):
     """ Comprime a pasta de origem para o destino especificado. """
+    print("A comprimir a cópia local...")
     try:
         print("Origem:", origem)
         print("Destino", destino)
-        arq = shutil.make_archive(destino, 'zip', origem)
+        arq = shutil.make_archive(destino, 'zip', root_dir=origem, base_dir=origem)
         return arq
     except Exception as e:
         print('\n\nOcorreu um erro durante a compressão:')
@@ -50,6 +62,7 @@ def comprimir_pasta(origem, destino):
 
 def upload_dropbox(archive, dropbox_path, token):
     """ Faz upload do ficheiro especificado para a Dropbox. """
+    print("A fazer upload para a Dropbox...")
     try:
         dbx = dropbox.Dropbox(token)
         with open(archive, 'rb') as f:
@@ -63,6 +76,7 @@ def upload_dropbox(archive, dropbox_path, token):
 
 def apagar_arquivo(archive):
     """ Apaga o ficheiro especificado no sistema de ficheiros local. """
+    print("A apagar o ficheiro temporário local...")
     try:
         os.remove(archive)
     except Exception as e:
