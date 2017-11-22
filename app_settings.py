@@ -16,7 +16,6 @@ INPUT_FOLDER = '~/Desktop/Filemaker_backups/db-backup/'
 
 # Caminho para o arquivo zip temporário a criar para o upload (com '/' no final).
 ARCHIVE_PATH = '~/Desktop/tmp/'
-ARCHIVE_FILE_NAME = "db-backup__"
 
 # Caminho de destino na Dropbox para o arquivo a carregar (serão acrescentados no 
 # final o carimbo de data/hora e a extensão '.zip'). Sem '/' no final.
