@@ -15,14 +15,13 @@ Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
 
 import shutil
 import datetime
-import os, os.path
-from pathlib import Path
+import os
+import os.path
 
 import dropbox
 
-#from app_settings import *
-#from app_settings_iOS import *
-from app_settings_Mac import *
+from app_settings import INPUT_FOLDER, ARCHIVE_PATH, ARCHIVE_FILE_NAME
+from app_settings import REMOTE_PATH, BACKUP_LOG_FILE, TOKEN
 
 
 def obter_lista_de_pastas(register_file_path):
@@ -30,6 +29,7 @@ def obter_lista_de_pastas(register_file_path):
         essa lista com as pastas existentes no computador local. A função
         devolve a lista das pastas a arquivar e copiar.
     """
+    print('A obter lista de pastas a copiar...')
     # Lista todas as subpastas na pasta principal (aqui designada como "raiz")
     raiz = os.path.expanduser(INPUT_FOLDER)
     pastas = ["{}{}{}".format(raiz, "/", pasta) for pasta in next(os.walk(raiz))[1]]
@@ -37,21 +37,21 @@ def obter_lista_de_pastas(register_file_path):
     # Obter do ficheiro a lista das pastas já tratadas e gerar lista sem essas
 
     lista_final = pastas     #TODO - retirar as pastas já presentes no ficheiro de registo
-
+    print('\n\nLista depastas a copiar:\n', lista_final)
     return lista_final
 
 
 def adiciona_registo(folder):
     """ Adiciona o caminho especificado ao ficheiro de registo. """
-    print("Adicionando registo (TODO)") #TODO
+    print("\n\nAdicionando registo (TODO)") #TODO
 
 
 def comprimir_pasta(origem, destino):
     """ Comprime a pasta de origem para o destino especificado. """
-    print("A comprimir a cópia local...")
+    print("\n\nA comprimir a cópia local...")
     try:
         print("Origem:", origem)
-        print("Destino", destino)
+        print("Destino:", destino)
         arq = shutil.make_archive(destino, 'zip', root_dir=origem, base_dir=origem)
         return arq
     except Exception as e:
@@ -62,7 +62,7 @@ def comprimir_pasta(origem, destino):
 
 def upload_dropbox(archive, dropbox_path, token):
     """ Faz upload do ficheiro especificado para a Dropbox. """
-    print("A fazer upload para a Dropbox...")
+    print("\n\nA fazer upload para a Dropbox...")
     try:
         dbx = dropbox.Dropbox(token)
         with open(archive, 'rb') as f:
