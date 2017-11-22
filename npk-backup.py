@@ -17,11 +17,15 @@ import shutil
 import datetime
 import os
 import os.path
+import subprocess
+import pickle
+
+from pprint import pprint 
 
 import dropbox
 
-from app_settings import INPUT_FOLDER, ARCHIVE_PATH, ARCHIVE_FILE_NAME
-from app_settings import REMOTE_PATH, BACKUP_LOG_FILE, TOKEN
+from app_settings_Mac import INPUT_FOLDER, ARCHIVE_PATH, ARCHIVE_FILE_NAME
+from app_settings_Mac import REMOTE_PATH, BACKUP_LOG_FILE, TOKEN
 
 
 def obter_lista_de_pastas(register_file_path):
@@ -29,30 +33,56 @@ def obter_lista_de_pastas(register_file_path):
         essa lista com as pastas existentes no computador local. A função
         devolve a lista das pastas a arquivar e copiar.
     """
-    print('A obter lista de pastas a copiar...')
+    print('A obter lista de pastas existentes no armazenamento local...')
     # Lista todas as subpastas na pasta principal (aqui designada como "raiz")
     raiz = os.path.expanduser(INPUT_FOLDER)
-    pastas = ["{}{}{}".format(raiz, "/", pasta) for pasta in next(os.walk(raiz))[1]]
+    pastas_locais = ["{}{}".format(raiz, pasta) for pasta in next(os.walk(raiz))[1]]
     
     # Obter do ficheiro a lista das pastas já tratadas e gerar lista sem essas
+    print('A obter lista de pastas já arquivadas...')
+    try:
+        with open(register_file_path, 'rb') as f:
+            pastas_arquivadas = pickle.load(f)
+    except Exception as e:
+        pastas_arquivadas = []
+        print('\n\nOcorreu um erro durante a leitura do registo:')
+        print(e)
 
-    lista_final = pastas     #TODO - retirar as pastas já presentes no ficheiro de registo
-    print('\n\nLista depastas a copiar:\n', lista_final)
+    lista_final = [pasta for pasta in pastas_locais if pasta not in pastas_arquivadas]
     return lista_final
 
 
-def adiciona_registo(folder):
+def adiciona_registo(register_file_path, path):
     """ Adiciona o caminho especificado ao ficheiro de registo. """
-    print("\n\nAdicionando registo (TODO)") #TODO
+    print("\n\nAdicionando registo...") #TODO
+    
+    try:
+        with open(register_file_path, 'rb') as f:
+            pastas = pickle.load(f)
+    except Exception as e:
+        pastas = []
+        print('\n\nOcorreu um erro durante a leitura do registo:')
+        print(e)
+
+    pastas.append(path)
+    pprint(pastas)
+
+    try:
+        with open(register_file_path, 'wb') as f:
+            pickle.dump(pastas, f)
+    except Exception as e:
+        print('\n\nOcorreu um erro durante a atualização do ficheiro de registo:')
+        print(e)
+    
 
 
 def comprimir_pasta(origem, destino):
     """ Comprime a pasta de origem para o destino especificado. """
-    print("\n\nA comprimir a cópia local...")
     try:
-        print("Origem:", origem)
-        print("Destino:", destino)
-        arq = shutil.make_archive(destino, 'zip', root_dir=origem, base_dir=origem)
+        print("A comprimir a cópia local...")
+        #print("Origem:", origem)
+        #print("Destino:", destino)
+        arq = shutil.make_archive(destino, 'zip', root_dir=origem)
         return arq
     except Exception as e:
         print('\n\nOcorreu um erro durante a compressão:')
@@ -62,8 +92,8 @@ def comprimir_pasta(origem, destino):
 
 def upload_dropbox(archive, dropbox_path, token):
     """ Faz upload do ficheiro especificado para a Dropbox. """
-    print("\n\nA fazer upload para a Dropbox...")
     try:
+        print("A fazer upload para a Dropbox...\n", dropbox_path)
         dbx = dropbox.Dropbox(token)
         with open(archive, 'rb') as f:
             dbx.files_upload(f.read(), dropbox_path)
@@ -76,8 +106,8 @@ def upload_dropbox(archive, dropbox_path, token):
 
 def apagar_arquivo(archive):
     """ Apaga o ficheiro especificado no sistema de ficheiros local. """
-    print("A apagar o ficheiro temporário local...")
     try:
+        print("\nA apagar o ficheiro temporário local...")
         os.remove(archive)
     except Exception as e:
         print('\n\nOcorreu um erro ao apagar o arquivo zip:')
@@ -87,18 +117,29 @@ def apagar_arquivo(archive):
 def main():
     backup_log_path = os.path.expanduser(BACKUP_LOG_FILE)
     dropbox_token = TOKEN
-    
-    for path in obter_lista_de_pastas(backup_log_path):
+
+    lista_pastas_novas = obter_lista_de_pastas(backup_log_path)
+    if lista_pastas_novas == []:
+        print("\nNão há pastas novas! A terminar a operação.\n")
+        return
+        
+    print("A iniciar procedimento de arquivo...\n======================")
+    for path in lista_pastas_novas:
+        print("\n\n---------\nPasta atual:", path)
         timestamp = str(datetime.datetime.now())
         input_path = os.path.expanduser(path)
-        archive_path = os.path.expanduser(ARCHIVE_PATH + ARCHIVE_FILE_NAME + timestamp)
-        dropbox_archive_path = REMOTE_PATH + timestamp + ".zip"
+        hoje = datetime.datetime.now()
+        ano, mes, dia =  hoje.year, hoje.month, hoje.day
+                
+        archive_file_name = os.path.basename(os.path.normpath(os.path.expanduser(path)))
+        archive_path = os.path.expanduser(ARCHIVE_PATH + archive_file_name + "____" + timestamp)
+        dropbox_archive_path = "{}/{}/{}/{}/{}.zip".format(REMOTE_PATH, ano, mes, dia, archive_file_name + "____" + timestamp)
 
         arquivo = comprimir_pasta(input_path, archive_path)
 
         if arquivo:
             if upload_dropbox(arquivo, dropbox_archive_path, dropbox_token):
-                adiciona_registo(input_path)
+                adiciona_registo(backup_log_path, path)
             apagar_arquivo(arquivo)
     
 
