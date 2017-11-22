@@ -4,10 +4,13 @@
 Um pequeno utilitário para automatizar a cópia de segurança de uma determinada
 pasta (por exemplo, cópias de segurança locais de uma base de dados Filemaker,
 uma coleção de scripts e aplicações do Pythonista, etc.), criando arquivos 
-*zip* individuais a partir de cada pasta principal nalocalização especificada e
+*zip* individuais a partir de cada pasta principal na localização especificada e
 fazendo *upload* dos mesmos para a Dropbox. O programa mantém um registo
-simples, por forma a nao repetir as tarefas de compressão e upload já
-realizadas.
+simples, por forma a não repetir as tarefas de compressão e upload já
+realizadas. Em cada execução, são efetuadas cópias individuais de cada pasta
+nova, que ainda não conste nas cópias anteriores. Não são contudo copiadas
+pastas nem ficheiros previamente copiados, que possam ter sido alterados 
+entretanto.
 
 © 2017 Victor Domingos (http://victordomingos.com)
 Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
