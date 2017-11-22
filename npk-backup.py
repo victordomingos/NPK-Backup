@@ -24,8 +24,8 @@ from pprint import pprint
 
 import dropbox
 
-from app_settings_Mac import INPUT_FOLDER, ARCHIVE_PATH, ARCHIVE_FILE_NAME
-from app_settings_Mac import REMOTE_PATH, BACKUP_LOG_FILE, TOKEN
+from app_settings import INPUT_FOLDER, ARCHIVE_PATH, ARCHIVE_FILE_NAME
+from app_settings import REMOTE_PATH, BACKUP_LOG_FILE, TOKEN
 
 
 def obter_lista_de_pastas(register_file_path):
