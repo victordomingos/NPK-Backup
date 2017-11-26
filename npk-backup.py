@@ -42,7 +42,7 @@ def obter_lista_de_pastas(register_file_path):
                      for pasta in next(os.walk(raiz))[1]]
 
     # Obter do ficheiro a lista das pastas já tratadas e gerar lista sem essas
-    print('A obter lista de pastas já arquivadas...')
+    print('A obter lista de pastas ja arquivadas...')
     try:
         with open(register_file_path, 'rb') as f:
             pastas_arquivadas = pickle.load(f)
@@ -82,11 +82,11 @@ def adiciona_registo(register_file_path, path):
 def comprimir_pasta(origem, destino):
     """ Comprime a pasta de origem para o destino especificado. """
     try:
-        print("A comprimir a cópia local...")
+        print("A comprimir a copia local...")
         arq = shutil.make_archive(destino, 'zip', root_dir=origem)
         return arq
     except Exception as e:
-        print('\n\nOcorreu um erro durante a compressão:')
+        print('\n\nOcorreu um erro durante a compressao:')
         print(e)
         return None
 
@@ -108,7 +108,7 @@ def upload_dropbox(archive, dropbox_path, token):
 def apagar_arquivo(archive):
     """ Apaga o ficheiro especificado no sistema de ficheiros local. """
     try:
-        print("\nA apagar o ficheiro temporário local...")
+        print("\nA apagar o ficheiro temporario local...")
         os.remove(archive)
     except Exception as e:
         print('\n\nOcorreu um erro ao apagar o arquivo zip:')
@@ -121,7 +121,7 @@ def main():
 
     lista_pastas_novas = obter_lista_de_pastas(backup_log_path)
     if lista_pastas_novas == []:
-        print("\nNão há pastas novas! A terminar a operação.\n")
+        print("\nNão ha pastas novas! A terminar a operacao.\n")
         return
 
     print("A iniciar procedimento de arquivo...\n======================")
