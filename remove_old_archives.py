@@ -2,10 +2,11 @@
 # encoding: utf-8
 """
 Um pequeno utilitário complementar ao utilitário NPK-Backup, que serve para
-automatizar a remoção de ficheiros de arquivo antigos na pasta especificada.
-Em cada execução, este programa apaga todas as pastas (e respetivos conteúdos)
-cuja data seja mais recente do que o número de dias indicado no ficheiro de
-configurações.
+automatizar a remoção de ficheiros de arquivo antigos na pasta especificada
+(a utilizar numa máquina onde estejam alojada a pasta de arquivo sincronizada
+com a Dropbox). Em cada execução, este programa apaga todas as pastas (e
+respetivos conteúdos) cuja data seja mais recente do que o número de dias
+indicado no ficheiro de configurações.
 
 NOTA: Este script apaga de forma imediata e irreversível ficheiros e pastas,
 sem qualquer aviso prévio ao utilizador, pelo que existe risco de perda de
