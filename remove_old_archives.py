@@ -47,23 +47,47 @@ def delete_dir_by_date(main_path, year, month=None, day=None):
 
 
 for pasta_ano in os.listdir(pasta_principal):
-    if int(pasta_ano) < ano:
-        delete_dir_by_date(pasta_principal, pasta_ano)
+    if pasta_ano.startswith('.'):
         continue
-    elif int(pasta_ano) > ano:
-        continue  # passa para a pasta de ano seguinte
-
+    try:
+        if int(pasta_ano) < ano:
+            delete_dir_by_date(pasta_principal, pasta_ano)
+            continue
+        elif int(pasta_ano) > ano:
+            continue  # passa para a pasta de ano seguinte
+    except Exception as e:
+        print("An exception occurred while iterating through the folders.")
+        print(e)
+        print("Continuing with next folder...")
+        continue
+    
     # se pasta_ano == ano, então continua a processar o seu conteúdo...
     pasta_ano_atual = pasta_principal + '/' + pasta_ano
     for pasta_mes in os.listdir(pasta_ano_atual):
-        if int(pasta_mes) < mes:
-            delete_dir_by_date(pasta_principal, pasta_ano, pasta_mes)
+        if pasta_mes.startswith('.'):
             continue
-        elif int(pasta_mes) > mes:
-            continue  # passa para a pasta de mes seguinte
+        try:
+            if int(pasta_mes) < mes:
+                delete_dir_by_date(pasta_principal, pasta_ano, pasta_mes)
+                continue
+            elif int(pasta_mes) > mes:
+                continue  # passa para a pasta de mes seguinte
+        except Exception as e:
+            print("An exception occurred while iterating through the folders.")
+            print(e)
+            print("Continuing with next folder...")
+            continue
 
         # se pasta_mes == mes, então continua a processar o seu conteúdo...
         pasta_mes_atual = pasta_principal + '/' + pasta_ano + '/' + pasta_mes
         for pasta_dia in os.listdir(pasta_mes_atual):
-            if int(pasta_dia) < dia:
-                delete_dir_by_date(pasta_principal, pasta_ano, pasta_mes, pasta_dia)
+            if pasta_dia.startswith('.'):
+                continue
+            try:
+                if int(pasta_dia) < dia:
+                    delete_dir_by_date(pasta_principal, pasta_ano, pasta_mes, pasta_dia)
+            except Exception as e:
+                print("An exception occurred while iterating through the folders.")
+                print(e)
+                print("Continuing with next folder...")
+                continue
