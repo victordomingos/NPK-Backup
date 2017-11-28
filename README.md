@@ -6,7 +6,8 @@ O programa mantém um registo simples, por forma a nao repetir as tarefas de com
 ## Dependências
 Esta aplicação é desenvolvida em Python 3.5 e requer, na versão atual, o(s) seguinte(s) módulo(s) externo(s):
 
-- dropbox
+- dropbox (necessário para o utilitário NPK-Backup)
+- send2trash (necessário para o utilitário remove_old_archives.py)
 
 O desenvolvimento e testes têm sido realizados em Mac e iOS (Pythonista 3), no entanto deverá ser bastante simples a adaptação para funcionar sem problemas em Windows ou Linux.
 
