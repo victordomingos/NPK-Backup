@@ -30,13 +30,9 @@ from app_settings_remove_old import *
 
 logger = logging.getLogger()
 
-pasta_principal = os.path.expanduser(BACKUPS_FOLDER)
-log_path = os.path.expanduser(LOGS_PATH)
-timeout = datetime.datetime.now() - datetime.timedelta(days=BACKUP_TIMEOUT)
-ano, mes, dia = timeout.year, timeout.month, timeout.day
-
 
 def setup_logging():
+    log_path = os.path.expanduser(LOGS_PATH)
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
     
@@ -71,9 +67,11 @@ def delete_dir_by_date(main_path, year, month=None, day=None):
 
 
 def main():
-
-    setup_logging()
+    pasta_principal = os.path.expanduser(BACKUPS_FOLDER)
+    timeout = datetime.datetime.now() - datetime.timedelta(days=BACKUP_TIMEOUT)
+    ano, mes, dia = timeout.year, timeout.month, timeout.day
     
+    setup_logging()
     
     for pasta_ano in os.listdir(pasta_principal):
         if pasta_ano.startswith('.'):
