@@ -24,7 +24,6 @@ import pickle
 import logging
 import logging.handlers
 
-
 from pprint import pformat
 
 import dropbox
