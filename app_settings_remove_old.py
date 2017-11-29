@@ -20,5 +20,6 @@ BACKUP_TIMEOUT = 5
 # Usar 'Lixo'/'Reciclagem' do sistema operativo em vez de apagar imediatamente?
 USE_TRASH = True
 
+# Caminho para o ficheiro de registo
 LOGS_PATH = '~/Dropbox/npk-backup.log'
 # ----------------------------------------------------------
