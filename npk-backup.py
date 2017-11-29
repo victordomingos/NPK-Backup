@@ -21,13 +21,38 @@ import datetime
 import os
 import os.path
 import pickle
+import logging
+import logging.handlers
 
-from pprint import pprint
+
+from pprint import pformat
 
 import dropbox
 
-from app_settings import INPUT_FOLDER, ARCHIVE_PATH
-from app_settings import REMOTE_PATH, BACKUP_LOG_FILE, TOKEN
+from app_settings_Mac import INPUT_FOLDER, ARCHIVE_PATH
+from app_settings_Mac import REMOTE_PATH, BACKUP_LOG_FILE, TOKEN, LOGS_PATH
+
+
+logger = logging.getLogger()
+
+
+def setup_logging():
+    log_path = os.path.expanduser(LOGS_PATH)
+    
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+    
+    # Write log messages to a file
+    file = logging.FileHandler(log_path)
+    file.setLevel(logging.DEBUG)
+    file.setFormatter(formatter)
+    logger.addHandler(file)
+    
+    # Show log messages also on screen
+    screen = logging.StreamHandler()
+    screen.setLevel(logging.DEBUG)
+    screen.setFormatter(formatter)
+    logger.addHandler(screen)
 
 
 def obter_lista_de_pastas(register_file_path):
@@ -35,21 +60,21 @@ def obter_lista_de_pastas(register_file_path):
         essa lista com as pastas existentes no computador local. A função
         devolve a lista das pastas a arquivar e copiar.
     """
-    print('A obter lista de pastas existentes no armazenamento local...')
+    logger.debug('A obter lista de pastas existentes no armazenamento local...')
     # Lista todas as subpastas na pasta principal (aqui designada como "raiz")
     raiz = os.path.expanduser(INPUT_FOLDER)
     pastas_locais = ["{}{}".format(raiz, pasta)
                      for pasta in next(os.walk(raiz))[1]]
 
     # Obter do ficheiro a lista das pastas já tratadas e gerar lista sem essas
-    print('A obter lista de pastas ja arquivadas...')
+    logger.debug('A obter lista de pastas ja arquivadas...')
     try:
         with open(register_file_path, 'rb') as f:
             pastas_arquivadas = pickle.load(f)
     except Exception as e:
         pastas_arquivadas = []
-        print('\n\nOcorreu um erro durante a leitura do registo:')
-        print(e)
+        logger.debug('>>> Ocorreu um erro durante a leitura do registo:')
+        logger.debug(str(e))
 
     lista_final = [pasta for pasta in pastas_locais
                    if pasta not in pastas_arquivadas]
@@ -58,75 +83,79 @@ def obter_lista_de_pastas(register_file_path):
 
 def adiciona_registo(register_file_path, path):
     """ Adiciona o caminho especificado ao ficheiro de registo. """
-    print("\n\nAdicionando registo...")
+    logger.debug("Adicionando registo...")
 
     try:
         with open(register_file_path, 'rb') as f:
             pastas = pickle.load(f)
     except Exception as e:
         pastas = []
-        print('\n\nOcorreu um erro durante a leitura do registo:')
-        print(e)
+        logger.debug('>>> Ocorreu um erro durante a leitura do registo:')
+        logger.debug(str(e))
 
     pastas.append(path)
-    pprint(pastas)
+    logger.debug(pformat(pastas))
 
     try:
         with open(register_file_path, 'wb') as f:
             pickle.dump(pastas, f)
     except Exception as e:
-        print('\n\nOcorreu um erro durante a atualização do ficheiro de registo:')
-        print(e)
+        logger.debug('>>> Ocorreu um erro durante a atualização do ficheiro de registo:')
+        logger.debug(str(e))
 
 
 def comprimir_pasta(origem, destino):
     """ Comprime a pasta de origem para o destino especificado. """
     try:
-        print("A comprimir a copia local...")
+        logger.debug("A comprimir a copia local...")
         arq = shutil.make_archive(destino, 'zip', root_dir=origem)
         return arq
     except Exception as e:
-        print('\n\nOcorreu um erro durante a compressao:')
-        print(e)
+        logger.debug('>>> Ocorreu um erro durante a compressao:')
+        logger.debug(str(e))
         return None
 
 
 def upload_dropbox(archive, dropbox_path, token):
     """ Faz upload do ficheiro especificado para a Dropbox. """
     try:
-        print("A fazer upload para a Dropbox...\n", dropbox_path)
+        logger.debug("A fazer upload para a Dropbox...")
+        logger.debug(str(dropbox_path))
         dbx = dropbox.Dropbox(token)
         with open(archive, 'rb') as f:
             dbx.files_upload(f.read(), dropbox_path)
         return True
     except Exception as e:
-        print('\n\nOcorreu um erro durante o upload para a Dropbox:')
-        print(e)
+        logger.debug('>>> Ocorreu um erro durante o upload para a Dropbox:')
+        logger.debug(str(e))
         return None
 
 
 def apagar_arquivo(archive):
     """ Apaga o ficheiro especificado no sistema de ficheiros local. """
     try:
-        print("\nA apagar o ficheiro temporario local...")
+        logger.debug("A apagar o ficheiro temporario local...")
         os.remove(archive)
     except Exception as e:
-        print('\n\nOcorreu um erro ao apagar o arquivo zip:')
-        print(e)
+        logger.debug('>>> Ocorreu um erro ao apagar o arquivo zip:')
+        logger.debug(str(e))
 
 
 def main():
     backup_log_path = os.path.expanduser(BACKUP_LOG_FILE)
     dropbox_token = TOKEN
+    
+    setup_logging()
 
     lista_pastas_novas = obter_lista_de_pastas(backup_log_path)
     if lista_pastas_novas == []:
-        print("\nNão ha pastas novas! A terminar a operacao.\n")
+        logger.debug("Não ha pastas novas! A terminar a operacao.\n")
         return
 
-    print("A iniciar procedimento de arquivo...\n======================")
+    logger.debug("A iniciar procedimento de arquivo...\n======================")
     for path in lista_pastas_novas:
-        print("\n\n---------\nPasta atual:", path)
+        logger.debug("--------- Pasta atual: ---------")
+        logger.debug(path)
         timestamp = str(datetime.datetime.now())
         input_path = os.path.expanduser(path)
         hoje = datetime.datetime.now()
