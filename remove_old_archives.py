@@ -25,7 +25,8 @@ import logging.handlers
 
 from send2trash import send2trash
 
-from app_settings_remove_old import *
+from app_settings_remove_old import BACKUPS_FOLDER, BACKUP_TIMEOUT
+from app_settings_remove_old import USE_TRASH, LOGS_PATH
 
 
 logger = logging.getLogger()
@@ -35,13 +36,13 @@ def setup_logging():
     log_path = os.path.expanduser(LOGS_PATH)
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
-    
+
     # Write log messages to a file
     file = logging.FileHandler(log_path)
     file.setLevel(logging.DEBUG)
     file.setFormatter(formatter)
     logger.addHandler(file)
-    
+
     # Show log messages also on screen
     screen = logging.StreamHandler()
     screen.setLevel(logging.DEBUG)
@@ -70,9 +71,9 @@ def main():
     pasta_principal = os.path.expanduser(BACKUPS_FOLDER)
     timeout = datetime.datetime.now() - datetime.timedelta(days=BACKUP_TIMEOUT)
     ano, mes, dia = timeout.year, timeout.month, timeout.day
-    
+
     setup_logging()
-    
+
     for pasta_ano in os.listdir(pasta_principal):
         if pasta_ano.startswith('.'):
             continue
@@ -87,7 +88,7 @@ def main():
             logger.debug(msg)
             logger.debug("Continuing with next folder...")
             continue
-        
+
         # se pasta_ano == ano, então continua a processar o seu conteúdo...
         pasta_ano_atual = pasta_principal + '/' + pasta_ano
         for pasta_mes in os.listdir(pasta_ano_atual):
@@ -104,7 +105,7 @@ def main():
                 logger.debug(msg)
                 logger.debug("Continuing with next folder...")
                 continue
-    
+
             # se pasta_mes == mes, então continua a processar o seu conteúdo...
             pasta_mes_atual = pasta_principal + '/' + pasta_ano + '/' + pasta_mes
             for pasta_dia in os.listdir(pasta_mes_atual):
