@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 # encoding: utf-8
 """
 Um pequeno utilitário para automatizar a cópia de segurança de uma determinada
@@ -37,16 +37,16 @@ logger = logging.getLogger()
 
 def setup_logging():
     log_path = os.path.expanduser(LOGS_PATH)
-    
+
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
-    
+
     # Write log messages to a file
     file = logging.FileHandler(log_path)
     file.setLevel(logging.DEBUG)
     file.setFormatter(formatter)
     logger.addHandler(file)
-    
+
     # Show log messages also on screen
     screen = logging.StreamHandler()
     screen.setLevel(logging.DEBUG)
@@ -143,7 +143,7 @@ def apagar_arquivo(archive):
 def main():
     backup_log_path = os.path.expanduser(BACKUP_LOG_FILE)
     dropbox_token = TOKEN
-    
+
     setup_logging()
 
     lista_pastas_novas = obter_lista_de_pastas(backup_log_path)
